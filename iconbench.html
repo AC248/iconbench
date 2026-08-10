@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="icon" type="image/png" href="favicon.png">
+<title>图标台 ICONBENCH</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --paper:#F4F3EE; --panel:#FFFFFF; --panel-2:#FAF9F5; --panel-3:#EFEDE6;
+  --ink:#1A1917; --ink-2:#4C4941; --muted:#8A8579;
+  --line:#E3E0D7; --line-2:#CFCBBE;
+  --accent:#BE4429; --accent-soft:#F8EAE5;
+  --ok:#3C7A5D; --warn:#A97518;
+  --r:9px; --r-sm:6px;
+  --t:200ms cubic-bezier(.2,.72,.2,1);
+  --t2:340ms cubic-bezier(.16,.86,.3,1);
+  --sh:0 1px 1px rgba(26,25,23,.04),0 10px 26px -16px rgba(26,25,23,.35);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+html[data-theme="dark"]{
+  --paper:#131311; --panel:#1C1C19; --panel-2:#222220; --panel-3:#2A2A26;
+  --ink:#EDEAE2; --ink-2:#B9B5AA; --muted:#8A857A;
+  --line:#2F2E29; --line-2:#454338;
+  --accent:#DE6949; --accent-soft:#2C1E19;
+  --ok:#61A585; --warn:#CFA04A;
+  --sh:0 1px 1px rgba(0,0,0,.4),0 14px 34px -18px rgba(0,0,0,.85);
+}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  transition:background var(--t2),color var(--t2);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+::selection{background:var(--accent);color:#fff}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.lab{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* ---------- scaffold ---------- */
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px 120px}
+
+/* ---------- topbar ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:1px solid var(--line);transition:border-color var(--t2),background var(--t2)}
+.topin{max-width:1240px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.mark{width:26px;height:26px;border:1.4px solid var(--ink);border-radius:7px;display:grid;place-items:center;
+  transition:transform var(--t2),border-color var(--t2),background var(--t)}
+.brand:hover .mark{transform:rotate(-90deg);background:var(--ink)}
+.brand:hover .mark svg{stroke:var(--paper)}
+.mark svg{stroke:var(--ink);transition:stroke var(--t)}
+.bname{font-weight:700;font-size:13.5px;letter-spacing:.14em;line-height:1}
+.bsub{font-size:10px;letter-spacing:.06em;color:var(--muted);line-height:1;margin-top:3px}
+.search{flex:1;position:relative;min-width:0;max-width:420px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);stroke:var(--muted);pointer-events:none;transition:stroke var(--t)}
+.search input{width:100%;height:38px;padding:0 34px 0 34px;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);font-size:16px;outline:none;transition:border-color var(--t),box-shadow var(--t),background var(--t2)}
+.search input::placeholder{color:var(--muted);font-size:13.5px}
+.search input:focus{border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 8%,transparent)}
+.search:focus-within svg{stroke:var(--ink)}
+.kbd{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;
+  color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 5px;transition:opacity var(--t)}
+.search:focus-within .kbd{opacity:0}
+.tacts{display:flex;align-items:center;gap:7px;margin-left:auto}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 13px;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--panel);font-size:13px;font-weight:500;
+  transition:border-color var(--t),background var(--t),transform var(--t),color var(--t);white-space:nowrap}
+.btn:hover{border-color:var(--line-2);background:var(--panel-2)}
+.btn:active{transform:scale(.97)}
+.btn svg{stroke:currentColor;flex-shrink:0}
+.btn.ico{width:38px;padding:0}
+.btn.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.pri:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.btn.sm{height:32px;padding:0 10px;font-size:12.5px}
+.btn.sm.ico{width:32px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+
+/* ---------- backup strip ---------- */
+.bstrip{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:12px 0 0}
+.bstrip .lab{margin-right:2px}
+.meter{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:11.5px;color:var(--muted)}
+.mbar{width:88px;height:4px;border-radius:99px;background:var(--panel-3);overflow:hidden}
+.mbar i{display:block;height:100%;width:0;background:var(--ink);border-radius:99px;transition:width var(--t2),background var(--t)}
+.mbar i.hi{background:var(--accent)}
+
+.nudge{display:none;align-items:center;gap:9px;margin-top:12px;padding:9px 13px;border-radius:var(--r);
+  background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+  font-size:12.5px;color:var(--accent);animation:slidein var(--t2) both}
+.nudge.on{display:flex}
+.nudge button{margin-left:auto;font-size:12px;text-decoration:underline;color:inherit;opacity:.8}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;align-items:center;gap:8px;margin:22px 0 14px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.chip{height:30px;padding:0 12px;border:1px solid var(--line);border-radius:99px;background:var(--panel);
+  font-size:12.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;
+  transition:background var(--t),color var(--t),border-color var(--t),transform var(--t)}
+.chip:hover{border-color:var(--line-2)}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip b{font-family:var(--mono);font-size:10.5px;opacity:.6;font-weight:500}
+.chip.addcat{border-style:dashed;border-color:var(--line-2);color:var(--muted)}
+.chip.addcat:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.chip.addcat svg{stroke:currentColor}
+.chip.usercat .chip-del{width:15px;height:15px;display:flex;align-items:center;justify-content:center;border-radius:99px;font-size:14px;line-height:1;margin-left:-2px;margin-right:-4px;transition:background var(--t),color var(--t)}
+.chip.usercat .chip-del:hover{background:var(--accent);color:#fff}
+.tspace{margin-left:auto;display:flex;align-items:center;gap:7px}
+.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.seg button{width:34px;height:32px;display:grid;place-items:center;transition:background var(--t),color var(--t)}
+.seg button svg{stroke:var(--muted);transition:stroke var(--t)}
+.seg button.on{background:var(--ink)}
+.seg button.on svg{stroke:var(--paper)}
+/* custom dropdown (replaces native select) */
+.dropdown{position:relative;display:inline-block;min-width:0}
+.ddBtn{height:34px;display:flex;align-items:center;gap:6px;padding:0 28px 0 11px;position:relative;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--panel);
+  font-size:13px;color:var(--ink);cursor:pointer;white-space:nowrap;
+  transition:border-color var(--t),background var(--t);outline:none}
+.ddBtn:hover{border-color:var(--line-2);background:var(--panel-2)}
+.ddBtn::after{content:'';position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:5px solid var(--muted);pointer-events:none;transition:border-top-color var(--t)}
+.ddBtn.open{border-color:var(--ink)}
+.ddBtn.open::after{border-top-color:var(--ink)}
+.ddMenu{position:absolute;top:calc(100%+4px);left:0;min-width:100%;z-index:35;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:4px;
+  opacity:0;transform:translateY(-6px);pointer-events:none;
+  transition:opacity var(--t),transform var(--t)}
+.ddMenu.on{opacity:1;transform:none;pointer-events:auto}
+.ddMenu button{display:block;width:100%;text-align:left;padding:7px 11px;border:none;
+  background:none;font-size:13px;color:var(--ink-2);border-radius:var(--r-sm);
+  cursor:pointer;transition:background var(--t),color var(--t);white-space:nowrap}
+.ddMenu button:hover{background:var(--panel-3);color:var(--ink)}
+.ddMenu button.on{color:var(--accent);font-weight:600;background:var(--accent-soft)}
+.ddWide{width:100%}.ddWide .ddBtn{width:100%;justify-content:flex-start}
+.tspace{margin-left:auto;display:flex;align-items:center;gap:7px}
+
+/* ---------- selection bar ---------- */
+.selbar{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140%);z-index:60;
+  display:flex;align-items:center;gap:8px;padding:9px 10px 9px 16px;border-radius:14px;
+  background:var(--ink);color:var(--paper);box-shadow:0 18px 44px -18px rgba(0,0,0,.6);
+  transition:transform var(--t2);max-width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center;
+  margin-bottom:env(safe-area-inset-bottom)}
+.selbar.on{transform:translate(-50%,0)}
+.selbar .n{font-family:var(--mono);font-size:12.5px;opacity:.75;margin-right:4px}
+.selbar button{height:34px;padding:0 11px;border-radius:8px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;
+  background:color-mix(in srgb,var(--paper) 12%,transparent);transition:background var(--t),transform var(--t)}
+.selbar button:hover{background:color-mix(in srgb,var(--paper) 24%,transparent)}
+.selbar button:active{transform:scale(.95)}
+.selbar button svg{stroke:currentColor}
+
+/* ---------- grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:10px}
+.card{position:relative;border:1px solid var(--line);border-radius:11px;background:var(--panel);
+  padding:16px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:9px;overflow:hidden;
+  transition:border-color var(--t),transform var(--t),box-shadow var(--t),background var(--t2);
+  animation:pop var(--t2) both;animation-delay:calc(var(--i)*14ms)}
+.card::after{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
+  box-shadow:inset 0 0 0 0 var(--ink);transition:box-shadow var(--t)}
+.card:hover{transform:translateY(-2px);box-shadow:var(--sh);border-color:var(--line-2)}
+.card.sel{border-color:var(--ink)}
+.card.sel::after{box-shadow:inset 0 0 0 1px var(--ink)}
+.glyph{display:grid;place-items:center;color:var(--ink);transition:transform var(--t2),color var(--t2);height:52px}
+.glyph svg{display:block;transition:width var(--t2),height var(--t2)}
+.glyph img{display:block;object-fit:contain}
+.card:hover .glyph{transform:scale(1.09)}
+.cname{font-size:12px;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--ink-2);transition:color var(--t)}
+.card:hover .cname{color:var(--ink)}
+.cmeta{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.cact{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:3px;padding:6px;
+  background:linear-gradient(to top,var(--panel) 62%,transparent);
+  transform:translateY(110%);opacity:0;transition:transform var(--t),opacity var(--t)}
+.card:hover .cact,.card:focus-within .cact,.card.sel .cact{transform:translateY(0);opacity:1}
+.cact button{width:29px;height:29px;display:grid;place-items:center;border-radius:7px;border:1px solid var(--line);
+  background:var(--panel);transition:background var(--t),border-color var(--t),transform var(--t)}
+.cact button svg{stroke:var(--ink-2);transition:stroke var(--t)}
+.cact button:hover{background:var(--ink);border-color:var(--ink)}
+.cact button:hover svg{stroke:var(--paper)}
+.cact button:active{transform:scale(.9)}
+.cact button[data-action="sel"] .chk-mark{stroke:var(--paper);stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset var(--t2)}
+.card.sel .cact button[data-action="sel"]{background:var(--ink);border-color:var(--ink)}
+.card.sel .cact button[data-action="sel"] svg{stroke:var(--paper)}
+.card.sel .cact button[data-action="sel"] .chk-mark{stroke-dashoffset:0}
+.fav{position:absolute;right:7px;top:7px;width:18px;height:18px;display:grid;place-items:center;opacity:0;transition:opacity var(--t),transform var(--t)}
+.fav svg{stroke:var(--muted);fill:none;transition:stroke var(--t),fill var(--t),transform var(--t)}
+.card:hover .fav{opacity:1}
+.card .fav.on{opacity:1}
+.fav.on svg{stroke:var(--warn);fill:var(--warn)}
+.fav:active svg{transform:scale(.8)}
+#efav svg{stroke:var(--muted);fill:none;transition:stroke var(--t),fill var(--t),transform var(--t)}
+#efav.on svg{stroke:var(--warn);fill:var(--warn)}
+#efav:active svg{transform:scale(.85)}
+
+/* list view */
+.grid.list{grid-template-columns:1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.grid.list .card{flex-direction:row;align-items:center;border:none;border-bottom:1px solid var(--line);border-radius:0;
+  padding:9px 14px 9px 40px;gap:14px;transform:none!important}
+.grid.list .card:last-child{border-bottom:none}
+.grid.list .card:hover{background:var(--panel-2);box-shadow:none}
+.grid.list .card::after{border-radius:0}
+.grid.list .glyph{height:auto;width:30px}
+.grid.list .cname{text-align:left;flex:1;font-size:13.5px}
+.grid.list .cmeta{margin-left:auto}
+.grid.list .cact{position:static;transform:none;opacity:0;padding:0;background:none;width:auto}
+.grid.list .card:hover .cact{opacity:1}
+.grid.list .cact{position:static;transform:none;opacity:0;padding:0;background:none;width:auto}
+.grid.list .card:hover .cact,.grid.list .card.sel .cact{opacity:1}
+.grid.list .fav{position:static;order:9}
+
+.empty{text-align:center;padding:70px 20px;color:var(--muted);animation:pop var(--t2) both}
+.empty svg{stroke:var(--line-2);margin-bottom:14px}
+.empty p{margin:0 0 4px;font-size:14px;color:var(--ink-2)}
+.empty span{font-size:12.5px}
+
+@keyframes pop{from{opacity:0;transform:translateY(9px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes slidein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+/* ---------- scrim / drawer / modal ---------- */
+.scrim{position:fixed;inset:0;z-index:70;background:rgba(20,19,17,0);backdrop-filter:blur(0px);
+  opacity:0;pointer-events:none;transition:opacity var(--t2),background var(--t2),backdrop-filter var(--t2)}
+.scrim.on{opacity:1;pointer-events:auto;background:rgba(20,19,17,.42);backdrop-filter:blur(3px)}
+
+.drawer{position:fixed;top:0;right:0;bottom:0;width:392px;max-width:100vw;z-index:80;background:var(--panel);
+  border-left:1px solid var(--line);display:flex;flex-direction:column;
+  transform:translateX(101%);transition:transform var(--t2);box-shadow:-24px 0 60px -30px rgba(0,0,0,.5)}
+.drawer.on{transform:none}
+.dhead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0}
+.dbody{flex:1;overflow:auto;padding:18px 16px 26px;overscroll-behavior:contain}
+.dfoot{border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+
+.stage{border:1px solid var(--line);border-radius:12px;padding:22px 16px 14px;display:flex;flex-direction:column;
+  align-items:center;gap:16px;background-color:var(--panel-2);
+  background-image:linear-gradient(45deg,var(--panel-3) 25%,transparent 25%),linear-gradient(-45deg,var(--panel-3) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--panel-3) 75%),linear-gradient(-45deg,transparent 75%,var(--panel-3) 75%);
+  background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;transition:background-color var(--t2)}
+.stagemain{display:grid;place-items:center;min-height:78px;color:var(--ink);transition:color var(--t2)}
+.sizes{display:flex;align-items:flex-end;gap:16px;padding-top:12px;border-top:1px dashed var(--line-2);width:100%;justify-content:center}
+.szitem{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink);transition:opacity var(--t)}
+.szitem span{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.szitem i{display:grid;place-items:center}
+
+.fld{margin-top:18px}
+.fld>label{display:block;margin-bottom:7px}
+.inp{width:100%;height:40px;padding:0 12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  font-size:16px;outline:none;transition:border-color var(--t),box-shadow var(--t)}
+.inp:focus{border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 8%,transparent)}
+textarea.inp{height:auto;min-height:112px;padding:11px 12px;resize:vertical;font-family:var(--mono);font-size:12.5px;line-height:1.6}
+.row2{display:flex;gap:8px}
+.row2>*{flex:1;min-width:0}
+
+.swatches{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.sw{width:28px;height:28px;border-radius:8px;border:1px solid var(--line-2);position:relative;
+  transition:transform var(--t),box-shadow var(--t)}
+.sw:hover{transform:scale(1.12)}
+.sw.on{box-shadow:0 0 0 2px var(--panel),0 0 0 3.6px var(--ink)}
+.sw.auto{background:linear-gradient(135deg,var(--ink) 50%,var(--paper) 50%)}
+.sw.custom{display:grid;place-items:center;overflow:hidden;background:var(--panel-2)}
+.sw.custom input{position:absolute;inset:-8px;opacity:0;cursor:pointer}
+.sw.custom svg{stroke:var(--muted)}
+
+.rangewrap{display:flex;align-items:center;gap:11px}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:22px;background:transparent;outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line-2);border-radius:99px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:99px;background:var(--ink);
+  margin-top:-6.5px;border:2px solid var(--panel);box-shadow:0 1px 4px rgba(0,0,0,.28);transition:transform var(--t)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.25)}
+input[type=range]::-moz-range-track{height:3px;background:var(--line-2);border-radius:99px}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:99px;background:var(--ink);border:2px solid var(--panel)}
+.rval{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:34px;text-align:right}
+
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 6px 0 10px;border-radius:99px;
+  background:var(--panel-3);font-size:12px;color:var(--ink-2);animation:pop 200ms both}
+.tag button{width:16px;height:16px;display:grid;place-items:center;border-radius:99px;transition:background var(--t)}
+.tag button:hover{background:var(--line-2)}
+.tag button svg{stroke:var(--ink-2)}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity var(--t2)}
+.modal.on{opacity:1;pointer-events:auto}
+.mback{position:absolute;inset:0;background:rgba(20,19,17,.46);backdrop-filter:blur(3px)}
+.mbox{position:relative;width:100%;max-width:540px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;
+  background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:0 30px 70px -28px rgba(0,0,0,.6);
+  transform:scale(.955) translateY(10px);opacity:0;transition:transform var(--t2),opacity var(--t2)}
+.modal.on .mbox{transform:none;opacity:1}
+.mhead{display:flex;align-items:center;gap:10px;padding:15px 17px;border-bottom:1px solid var(--line);flex-shrink:0}
+.mtitle{font-weight:650;font-size:14.5px}
+.mbody{padding:17px;overflow:auto;flex:1;overscroll-behavior:contain}
+.mfoot{padding:13px 17px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;flex-wrap:wrap}
+
+/* dropzone */
+.dz{border:1.6px dashed var(--line-2);border-radius:12px;padding:32px 18px;text-align:center;background:var(--panel-2);
+  transition:border-color var(--t),background var(--t),transform var(--t)}
+.dz.hot{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.014)}
+.dz svg{stroke:var(--muted);transition:stroke var(--t),transform var(--t2)}
+.dz.hot svg{stroke:var(--accent);transform:translateY(-4px)}
+.dz p{margin:12px 0 3px;font-size:14px;font-weight:550}
+.dz span{font-size:12px;color:var(--muted)}
+.dz .btn{margin-top:14px}
+.hr{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:11px;letter-spacing:.1em}
+.hr::before,.hr::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.dropveil{position:fixed;inset:0;z-index:120;display:grid;place-items:center;pointer-events:none;
+  background:color-mix(in srgb,var(--paper) 82%,transparent);backdrop-filter:blur(5px);
+  opacity:0;transition:opacity var(--t)}
+.dropveil.on{opacity:1}
+.dropveil .box{border:2px dashed var(--accent);border-radius:18px;padding:44px 60px;text-align:center;color:var(--accent);
+  transform:scale(.96);transition:transform var(--t2);background:var(--panel)}
+.dropveil.on .box{transform:none}
+.dropveil p{margin:12px 0 0;font-weight:600;font-size:15px}
+
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:15px;position:relative;overflow-x:auto}
+.tabs button{padding:9px 12px;font-size:13px;color:var(--muted);white-space:nowrap;transition:color var(--t)}
+.tabs button.on{color:var(--ink);font-weight:600}
+.tabs .ink{position:absolute;bottom:-1px;height:2px;background:var(--ink);border-radius:2px;
+  transition:transform var(--t2),width var(--t2);left:0}
+.code{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:12px;
+  font-family:var(--mono);font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-all;
+  max-height:210px;overflow:auto;color:var(--ink-2)}
+
+/* toast */
+.toasts{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:140;display:flex;flex-direction:column;gap:8px;
+  align-items:center;pointer-events:none;width:max-content;max-width:calc(100vw - 32px)}
+.toast{display:flex;align-items:center;gap:9px;padding:9px 15px;border-radius:99px;background:var(--ink);color:var(--paper);
+  font-size:13px;box-shadow:0 12px 30px -14px rgba(0,0,0,.6);animation:tin var(--t2) both}
+.toast.out{animation:tout 240ms both}
+.toast svg{stroke:currentColor;flex-shrink:0}
+.toast.err{background:var(--accent);color:#fff}
+@keyframes tin{from{opacity:0;transform:translateY(-14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-10px) scale(.96)}}
+
+.copied svg.a{display:none}
+.copied svg.b{display:block!important}
+svg.b{display:none;animation:pop 200ms both}
+
+.foot{text-align:center;color:var(--muted);font-size:11.5px;padding:34px 0 0;line-height:1.9}
+.foot b{font-weight:600;color:var(--ink-2)}
+
+/* ---------- mobile ---------- */
+@media (max-width:820px){
+  .drawer{width:100%;top:auto;height:88vh;border-left:none;border-top:1px solid var(--line);
+    border-radius:18px 18px 0 0;transform:translateY(101%)}
+  .drawer.on{transform:none}
+}
+@media (max-width:700px){
+  .wrap{padding:0 13px 130px}
+  .topin{padding:9px 13px;gap:9px;flex-wrap:wrap}
+  .brand{order:1}
+  .tacts{order:2;margin-left:auto}
+  .search{order:3;flex-basis:100%;max-width:none}
+  .search input{height:42px}
+  .kbd{display:none}
+  .bstrip .btn{flex:1;min-width:calc(50% - 5px);height:44px}
+  .bstrip .lab{flex-basis:100%;margin-bottom:-4px}
+  .meter{margin-left:0;flex-basis:100%;justify-content:flex-end}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+  .card{padding:14px 6px 8px}
+  .cact{position:static;transform:none;opacity:1;background:none;padding:2px 0 0}
+  .cact button{width:32px;height:32px}
+  .fav{opacity:1}
+  .grid.list .cact{opacity:1}
+  .toolbar{gap:7px}
+  .tspace{width:100%;margin-left:0}
+  .tspace .dropdown{flex:1}
+  .btn{height:40px}
+  .btn.ico{width:40px}
+  .selbar{left:12px;right:12px;bottom:12px;transform:translateY(160%);max-width:none;padding:9px}
+  .selbar.on{transform:none}
+  .selbar .n{width:100%;text-align:center;margin:0 0 2px}
+  .selbar button{flex:1;justify-content:center;height:42px}
+  .mbox{max-height:calc(100vh - 24px)}
+  .mfoot .btn{flex:1;height:44px}
+  .dfoot .btn{flex:1;min-width:calc(50% - 4px);height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topin">
+    <div class="brand" title="图标台">
+      <div class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16"/><path d="M4 16h16"/><path d="M9 4v16"/></svg></div>
+      <div><div class="bname">ICONBENCH</div><div class="bsub">图标台 / 本地图标库</div></div>
+    </div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="q" type="search" placeholder="搜索名称、标签或分类" autocomplete="off">
+      <span class="kbd">/</span>
+    </div>
+    <div class="tacts">
+      <button class="btn ico" id="themeBtn" title="切换明暗主题" aria-label="切换主题"></button>
+      <button class="btn pri" id="upBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg><span class="hide-xs">上传图标</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="bstrip">
+    <span class="lab">数据备份</span>
+    <button class="btn sm" id="expBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7.5 11.5L12 16l4.5-4.5"/><path d="M4 20h16"/></svg>导出 JSON 备份</button>
+    <button class="btn sm" id="impBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4 20h16"/></svg>导入恢复</button>
+    <button class="btn sm" id="seedBtn">清空示例数据</button>
+    <button class="btn sm danger" id="wipeBtn">清空全部</button>
+    <div class="meter"><span class="mono" id="mtxt">0 KB</span><div class="mbar"><i id="mbar"></i></div></div>
+  </div>
+  <div class="nudge" id="nudge">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".6" fill="currentColor"/><path d="M12 3l9 17H3z"/></svg>
+    <span id="nudgeTxt">图标已积累 30 个，建议导出一份 JSON 备份</span>
+    <button id="nudgeX">知道了</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="chips" id="cats"></div>
+    <div class="tspace">
+      <div class="dropdown" id="sortDropdown">
+        <button class="ddBtn" id="sortBtn"><span>最近添加</span></button>
+        <div class="ddMenu">
+          <button data-value="new" class="on">最近添加</button>
+          <button data-value="old">最早添加</button>
+          <button data-value="az">名称 A-Z</button>
+          <button data-value="fav">收藏优先</button>
+        </div>
+      </div>
+      <div class="seg">
+        <button id="vGrid" class="on" title="网格视图"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.4"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.4"/></svg></button>
+        <button id="vList" title="列表视图"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <main class="grid" id="grid"></main>
+  <div class="foot">
+    数据全部保存在这台设备的浏览器里 · 换设备请用 <b>导出 JSON</b> 迁移<br>
+    手机浏览器打开后「分享 → 添加到主屏幕」，可当独立 App 使用
+  </div>
+</div>
+
+<div class="selbar" id="selbar">
+  <span class="n" id="selN">已选 0</span>
+  <button id="sDl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7.5 11.5L12 16l4.5-4.5"/><path d="M4 20h16"/></svg>下载 SVG</button>
+  <button id="sSprite">导出 Sprite</button>
+  <button id="sShare"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="17.5" cy="6" r="2.6"/><circle cx="6.5" cy="12" r="2.6"/><circle cx="17.5" cy="18" r="2.6"/><path d="M9 10.7l6-3.4M9 13.3l6 3.4"/></svg>分享包</button>
+  <button id="sCat">改分类</button>
+  <button id="sDel"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6.5 7l.8 12.1a1 1 0 001 .9h7.4a1 1 0 001-.9L17.5 7"/></svg>删除</button>
+  <button id="sX"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<!-- drawer -->
+<div class="drawer" id="drawer">
+  <div class="dhead">
+    <span style="font-weight:650;font-size:14px;flex:1">编辑图标</span>
+    <button class="btn sm ico" id="drawerClose" title="关闭"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dbody">
+    <div class="stage">
+      <div class="stagemain" id="stagemain"></div>
+      <div class="sizes" id="sizes"></div>
+    </div>
+    <div class="fld"><label><span class="lab">名称</span></label><input class="inp" id="en" placeholder="例如: arrow-right" autocomplete="off"></div>
+    <div class="row2">
+      <div class="fld"><label><span class="lab">分类</span></label><div class="dropdown ddWide" id="ecatDropdown"><button class="ddBtn" id="ecatBtn"><span>未分类</span></button><div class="ddMenu" id="ecatMenu"></div></div></div>
+      <div class="fld"><label><span class="lab">收藏</span></label><button class="btn ico" id="efav" style="height:40px;width:40px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></button></div>
+    </div>
+    <div class="fld"><label><span class="lab">标签（回车添加）</span></label><input class="inp" id="etags" placeholder="例如: ui, arrows, line" autocomplete="off"><div class="tags" id="etaglist"></div></div>
+    <div class="fld" id="colorFld"><label><span class="lab">颜色</span></label>
+      <div class="swatches" id="eswatches"></div>
+    </div>
+    <div class="fld" id="strokeFld" style="display:none"><label><span class="lab">描边粗细</span></label>
+      <div class="rangewrap"><input type="range" min="0.6" max="3.6" step="0.2" value="1.6" id="esw"><span class="rval mono" id="eswv">1.6</span></div>
+    </div>
+  </div>
+  <div class="dfoot">
+    <button class="btn" id="dsvg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7.5 11.5L12 16l4.5-4.5"/><path d="M4 20h16"/></svg>下载 SVG</button>
+    <button class="btn" id="dpng">下载 PNG</button>
+    <button class="btn" id="dshare">分享</button>
+    <button class="btn danger" id="ddel" style="margin-left:auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6.5 7l.8 12.1a1 1 0 001 .9h7.4a1 1 0 001-.9L17.5 7"/></svg></button>
+  </div>
+</div>
+
+<!-- upload modal -->
+<div class="modal" id="upModal">
+  <div class="mback" id="upBack"></div>
+  <div class="mbox">
+    <div class="mhead">
+      <span class="mtitle">上传图标</span>
+      <button class="btn sm ico" style="margin-left:auto" id="upClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="dz" id="dz">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+        <p>拖拽 SVG 文件到此处</p><span>或点击选择文件 · 支持 .svg / .png / .jpg</span>
+        <button class="btn sm" id="dzBtn">选择文件</button>
+        <input type="file" id="fi" style="display:none" accept=".svg,.png,.jpg,.jpeg" multiple>
+      </div>
+      <div class="hr">或粘贴 SVG 代码</div>
+      <textarea class="inp" id="scode" placeholder="将 SVG 代码粘贴到这里..."></textarea>
+      <button class="btn" style="margin-top:10px;width:100%;height:42px" id="spaste">解析并导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- share modal -->
+<div class="modal" id="shModal">
+  <div class="mback" id="shBack"></div>
+  <div class="mbox">
+    <div class="mhead">
+      <span class="mtitle">分享与导出</span>
+      <button class="btn sm ico" style="margin-left:auto" id="shClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="tabs" id="shtabs">
+        <button data-tab="svg" class="on">SVG 代码</button>
+        <button data-tab="dataurl">DataURL</button>
+        <button data-tab="css">CSS</button>
+        <button data-tab="react">React</button>
+        <button data-tab="html">HTML</button>
+        <span class="ink"></span>
+      </div>
+      <div class="code" id="shcode"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn pri" id="shcopy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="4" width="10" height="15" rx="1.5"/><path d="M6 8H5a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>复制</button>
+      <button class="btn" id="shdl">下载文件</button>
+    </div>
+  </div>
+</div>
+
+<!-- confirm modal -->
+<div class="modal" id="cfModal">
+  <div class="mback" id="cfBack"></div>
+  <div class="mbox" style="max-width:390px">
+    <div class="mhead"><span class="mtitle" id="cfTitle">确认操作</span></div>
+    <div class="mbody" id="cfBody"></div>
+    <div class="mfoot">
+      <button class="btn" id="cfCancel">取消</button>
+      <button class="btn danger" id="cfOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- input modal (replaces native prompt) -->
+<div class="modal" id="inpModal">
+  <div class="mback" id="inpBack"></div>
+  <div class="mbox" style="max-width:390px">
+    <div class="mhead"><span class="mtitle" id="inpTitle">输入</span></div>
+    <div class="mbody"><input class="inp" id="inpField" placeholder="" autocomplete="off"></div>
+    <div class="mfoot">
+      <button class="btn" id="inpCancel">取消</button>
+      <button class="btn pri" id="inpOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- drop veil -->
+<div class="dropveil" id="dropVeil">
+  <div class="box">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+    <p>释放以上传文件</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<input type="file" id="impfi" style="display:none" accept=".json">
+<script>
+(function(){
+/* ========== SVG helpers ========== */
+// All SVG processing uses DOMParser in image/svg+xml mode to ensure proper namespace,
+// and serializes back to string. This is more reliable than HTML div.innerHTML for SVG.
+const SVGI = {
+  parse(rawSvg){
+    let s=(rawSvg||'').trim();
+    if(!s)return null;
+    if(!/xmlns\s*=\s*["']http:\/\/www\.w3\.org\/2000\/svg/i.test(s)){
+      s=s.replace(/^(<svg\b)/i,'$1 xmlns="http://www.w3.org/2000/svg"');
+    }
+    let doc=new DOMParser().parseFromString(s,'image/svg+xml');
+    let e=doc.documentElement;
+    if(!e||e.tagName!=='svg'||e.getElementsByTagName('parsererror').length)return null;
+    e.querySelectorAll('script,foreignObject').forEach(n=>n.remove());
+    let all=e.getElementsByTagName('*');
+    for(let n of all){
+      for(let a of[...n.attributes]){if(a.name.toLowerCase().startsWith('on'))n.removeAttribute(a.name)}
+    }
+    if(!e.getAttribute('viewBox')){
+      let w=e.getAttribute('width')||'24',h=e.getAttribute('height')||'24';
+      e.setAttribute('viewBox','0 0 '+parseFloat(w)+' '+parseFloat(h));
+    }
+    e.removeAttribute('width');e.removeAttribute('height');
+    return e
+  },
+
+  toString(svgEl){
+    try{return new XMLSerializer().serializeToString(svgEl)}
+    catch(e){return svgEl.outerHTML||''}
+  },
+
+  isStroke(svgEl){
+    let ct=0,cf=0;
+    function w(n){
+      if(n.nodeType!==1)return;
+      let f=n.getAttribute('fill'),s=n.getAttribute('stroke');
+      if(s&&s!=='none')ct++;
+      if(f&&f!=='none')cf++;
+      for(let c of n.children)w(c)
+    }
+    w(svgEl);
+    return ct>=cf
+  },
+
+  // Render SVG with optional color/strokeWidth override, return string.
+  // Handles three cases that broke previous versions:
+  // 1) Stroke icons where SVG root has fill="none" but no stroke attribute (children inherit 'none' → invisible)
+  // 2) Mixed icons with some explicit fills/strokes
+  // 3) Icons with currentColor references
+  build(rawSvg, options){
+    // options: {color: '#xxx'|null, strokeWidth: number|null, w: number, h: number, defaultInk: '#xxx'}
+    let el=this.parse(rawSvg);
+    if(!el)return null;
+    let userColor=(options.color&&options.color!=='currentColor')?options.color:null;
+    let defaultInk=options.defaultInk||'#1A1917';
+    let sw=options.strokeWidth;
+    // Detect stroke icon: root fill='none' and root stroke missing/'none'
+    let rootFill=el.getAttribute('fill');
+    let rootStroke=el.getAttribute('stroke');
+    let isStrokeIcon=(rootFill==='none')&&(rootStroke===null||rootStroke==='none');
+    // Effective stroke color: user override > currentColor (inherits from container)
+    let strokeColor=userColor||'currentColor';
+    // Walk and patch
+    function w(n){
+      if(n.nodeType!==1)return;
+      let f=n.getAttribute('fill'),s=n.getAttribute('stroke');
+      // Apply user color to explicit fill/stroke
+      if(userColor){
+        if(f!==null&&f!=='none'&&f!=='currentColor')n.setAttribute('fill',userColor);
+        if(s!==null&&s!=='none'&&s!=='currentColor')n.setAttribute('stroke',userColor);
+      }
+      // Apply stroke-width override to elements that have stroke (or will inherit)
+      if(sw!==undefined&&sw!==null){
+        if(s!==null&&s!=='none'){
+          n.setAttribute('stroke-width',String(sw));
+        }else if(isStrokeIcon){
+          if(n!==el)n.setAttribute('stroke-width',String(sw));
+        }
+      }
+      for(let c of n.children)w(c)
+    }
+    w(el);
+    // For stroke icons missing root stroke, add it explicitly so children inherit
+    if(isStrokeIcon){
+      el.setAttribute('stroke',strokeColor);
+      if(sw!==undefined&&sw!==null)el.setAttribute('stroke-width',String(sw));
+    }
+    if(options.w!==undefined){el.setAttribute('width',String(options.w));el.setAttribute('height',String(options.h))}
+    return this.toString(el)
+  },
+
+  defaultStrokeWidth(svgEl){
+    function f(n){
+      for(let a of n.attributes||[]){if(a.name==='stroke-width')return parseFloat(a.value)}
+      for(let c of n.children||[]){let v=f(c);if(v!==null)return v}
+      return null
+    }
+    let v=f(svgEl);
+    return v!==null?v:1.6
+  },
+
+  toDataURL(svgStr){return 'data:image/svg+xml,'+encodeURIComponent(svgStr)},
+
+  toPNG(svgStr, w, h){
+    return new Promise((resolve, reject)=>{
+      let url='data:image/svg+xml,'+encodeURIComponent(svgStr);
+      let img=new Image();
+      img.onload=()=>{
+        let c=document.createElement('canvas');
+        c.width=w;c.height=h;
+        let ctx=c.getContext('2d');
+        ctx.clearRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        c.toBlob(b=>resolve(b),'image/png');
+      };
+      img.onerror=reject;
+      img.src=url;
+    })
+  },
+
+  parseFile(file){return new Promise((resolve,reject)=>{
+    let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsText(file)
+  })}
+};
+
+// Render icon for DOM display.
+function buildSvgString(rawSvg, options){
+  return SVGI.build(rawSvg, Object.assign({defaultInk:getComputedInk()},options||{}))
+}
+
+// Render icon for export/download — uses currentColor if no specific color set.
+function buildSvgStringForExport(rawSvg, options){
+  let opts=options||{};
+  let color=opts.color;
+  let useCurrent=!color||color==='currentColor';
+  // When theme-following, use 'currentColor' as defaultInk so stroke icons export as currentColor
+  let str=SVGI.build(rawSvg,{
+    color: useCurrent ? null : color,
+    strokeWidth: opts.strokeWidth,
+    defaultInk: useCurrent ? 'currentColor' : '#1A1917'
+  });
+  return str
+}
+
+/* ========== config ========== */
+const DEFAULT_CATS=['界面元素','媒体','品牌标识','系统操作','社交','全部图标'];
+let icons=[],selected=new Set(),view='grid',currentCat='全部图标',sortBy='new',theme='light';
+let drawerId=null,shareId=null;
+let cfResolve=null;
+let userCats=[]; // user-defined categories, persisted in IDB meta
+
+function generateId(){return'ic_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6)}
+
+const PRESET_COLORS=['currentColor','#1A1917','#BE4429','#3C7A5D','#4C7FA3','#8A5CC6','#CFA04A','#7A8A95','#E36B5C'];
+
+/* ========== sample data ========== */
+const SAMPLES=[
+  {id:'s001',name:'arrow-right',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/></svg>',cat:'界面元素',tags:['arrows','navigation'],fav:true,ts:Date.now()-3600000,color:'#4C7FA3',type:'svg'},
+  {id:'s002',name:'cloud-upload',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 19H9a7 7 0 116.7-10"/><path d="M13 22v-7l-2.5 2.5M13 15l2.5 2.5"/><path d="M13 22H5a2 2 0 01-2-2v-1"/></svg>',cat:'系统操作',tags:['upload','cloud'],fav:false,ts:Date.now()-7200000,type:'svg'},
+  {id:'s003',name:'bookmark',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>',cat:'界面元素',tags:['save','favorite'],fav:true,ts:Date.now()-18000000,color:'currentColor',type:'svg'},
+  {id:'s004',name:'layers',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"/><polyline points="2 15.5 12 22 22 15.5"/></svg>',cat:'界面元素',tags:['stack','design'],fav:false,ts:Date.now()-86400000,type:'svg'},
+  {id:'s005',name:'activity',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',cat:'系统操作',tags:['chart','pulse'],fav:false,ts:Date.now()-172800000,color:'#BE4429',type:'svg'},
+  {id:'s006',name:'search',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>',cat:'界面元素',tags:['find','magnify'],fav:false,ts:Date.now()-160000,type:'svg'},
+  {id:'s007',name:'star-filled',raw:'<svg viewBox="0 0 24 24" fill="#CFA04A" stroke="#CFA04A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>',cat:'界面元素',tags:['rating','favorite'],fav:true,ts:Date.now()-400000,type:'svg'},
+  {id:'s008',name:'coffee-break',raw:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><path d="M6 1v3"/><path d="M10 1v3"/><path d="M14 1v3"/></svg>',cat:'',tags:[],fav:false,ts:Date.now()-250000,type:'svg'},
+];/* ========== IndexedDB storage ========== */
+// Replaces localStorage for unlimited storage capacity (browser quota: tens to hundreds of MB).
+// Auto-migrates existing localStorage data on first run.
+const IDB=(function(){
+  const NAME='IconbenchDB',VER=1;
+  let _db=null;
+  function open(){
+    if(_db)return Promise.resolve(_db);
+    return new Promise((resolve,reject)=>{
+      let r=indexedDB.open(NAME,VER);
+      r.onupgradeneeded=e=>{
+        let d=e.target.result;
+        if(!d.objectStoreNames.contains('icons'))d.createObjectStore('icons',{keyPath:'id'});
+        if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'})
+      };
+      r.onsuccess=e=>{_db=e.target.result;_db.onclose=()=>{_db=null};resolve(_db)};
+      r.onerror=e=>reject(e.target.error)
+    })
+  }
+  return{
+    async getAll(){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('icons','readonly'),r=tx.objectStore('icons').getAll();
+      r.onsuccess=()=>resolve(r.result);r.onerror=e=>reject(e.target.error)
+    })},
+    async putAll(items){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('icons','readwrite'),s=tx.objectStore('icons');
+      s.clear();items.forEach(i=>s.put(i));tx.oncomplete=()=>resolve();tx.onerror=e=>reject(e.target.error)
+    })},
+    async deleteAll(){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('icons','readwrite');tx.objectStore('icons').clear();
+      tx.oncomplete=()=>resolve();tx.onerror=e=>reject(e.target.error)
+    })},
+    async count(){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('icons','readonly'),r=tx.objectStore('icons').count();
+      r.onsuccess=()=>resolve(r.result);r.onerror=e=>reject(e.target.error)
+    })},
+    async getMeta(key){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('meta','readonly'),r=tx.objectStore('meta').get(key);
+      r.onsuccess=()=>resolve(r.result?r.result.value:null);r.onerror=e=>reject(e.target.error)
+    })},
+    async setMeta(key,val){let db=await open();return new Promise((resolve,reject)=>{
+      let tx=db.transaction('meta','readwrite'),s=tx.objectStore('meta');
+      s.put({key,value:val});tx.oncomplete=()=>resolve();tx.onerror=e=>reject(e.target.error)
+    })}
+  }
+})();
+
+// Legacy key for migration
+const STORAGE_KEY='wb_iconbench_data';
+
+async function loadIcons(){
+  // Try IndexedDB first
+  try{let db=await IDB.getAll();if(db.length>0){icons=db;let t=await IDB.getMeta('theme');if(t)theme=t;
+    let uc=await IDB.getMeta('userCats');if(uc&&Array.isArray(uc))userCats=uc;return}}catch(e){}
+  // Fallback: migrate from localStorage
+  try{let d=localStorage.getItem(STORAGE_KEY);if(d){let p=JSON.parse(d);icons=p.icons||[];theme=p.theme||'light';
+    if(p.userCats)userCats=p.userCats;
+    if(icons.length){IDB.putAll(icons).catch(()=>{});IDB.setMeta('theme',theme).catch(()=>{});if(userCats.length)IDB.setMeta('userCats',userCats).catch(()=>{});localStorage.removeItem(STORAGE_KEY);return}}
+  }catch(e){}
+  // Default samples
+  icons=JSON.parse(JSON.stringify(SAMPLES))
+}
+function saveIcons(){
+  IDB.putAll(icons).catch(e=>toast('保存失败：'+e.message,'err'));
+  IDB.setMeta('theme',theme).catch(()=>{});
+  IDB.setMeta('userCats',userCats).catch(()=>{});
+  updateMeter()
+}
+async function updateMeter(){
+  try{let c=await IDB.count();let el=document.getElementById('mtxt'),bar=document.getElementById('mbar');
+    el.textContent=c+' 个图标';
+    if(navigator.storage&&navigator.storage.estimate){
+      let s=await navigator.storage.estimate();
+      if(s.usage!==undefined&&s.quota){
+        let pct=s.usage/s.quota*100,mb=(s.usage/1048576).toFixed(1),quota=(s.quota/1048576).toFixed(0);
+        el.textContent=c+' 图标 / '+mb+' MB / '+quota+' MB';
+        bar.style.width=Math.min(pct,100)+'%';
+        bar.className=pct>80?'hi':'';
+        if(pct>=90&&!sessionStorage.getItem('wb_full_warn')){
+          sessionStorage.setItem('wb_full_warn','1');
+          toast('浏览器存储已用 '+pct.toFixed(0)+'%，建议导出备份','err')
+        }else if(pct<85){sessionStorage.removeItem('wb_full_warn')}
+      }
+    }
+  }catch(e){}
+  checkNudge()
+}
+function exportJSON(){let j=JSON.stringify({icons,theme},null,2);downloadFile(j,'iconbench-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');toast('备份已导出')}
+function importJSON(file){let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!d.icons||!Array.isArray(d.icons))throw new Error('格式错误');
+  let c=confirm('将导入 '+d.icons.length+' 个图标。\n\n选择「确定」替换全部，选择「取消」追加到现有库。');if(c===null)return;
+  if(c){icons=d.icons}else{let exist=new Set(icons.map(i=>i.id));for(let i of d.icons){if(exist.has(i.id)){i.id=generateId()}icons.push(i)}}
+  saveIcons();renderAll();toast('导入成功：'+d.icons.length+' 个图标','ok')}catch(e){toast('导入失败：文件格式不正确','err')}};r.readAsText(file)}
+function clearSamples(){let ids=new Set(SAMPLES.map(s=>s.id));icons=icons.filter(i=>!ids.has(i.id)&&!i._seed);saveIcons();renderAll();toast('示例数据已清除')}
+function clearAll(){cf('确定要清空全部图标？此操作不可撤销。',()=>{icons=[];saveIcons();renderAll();selected.clear();updateSelbar();toast('已清空')})}
+
+/* ========== render ========== */
+let catCounts={};
+function computeStats(){catCounts={};for(let i of icons){let c=i.cat||'未分类';catCounts[c]=(catCounts[c]||0)+1}}
+
+function getSortedIcons(){
+  let all=icons.filter(i=>{if(currentCat==='全部图标')return true;if(currentCat==='未分类')return!i.cat;return i.cat===currentCat});
+  if(sortBy==='new')all.sort((a,b)=>b.ts-a.ts);
+  else if(sortBy==='old')all.sort((a,b)=>a.ts-b.ts);
+  else if(sortBy==='az')all.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(sortBy==='fav')all.sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)||b.ts-a.ts);
+  return all
+}
+
+function renderGrid(){
+  let grid=document.getElementById('grid'),qVal=(document.getElementById('q').value||'').trim().toLowerCase();
+  let list=getSortedIcons();
+  if(qVal){list=list.filter(i=>(i.name||'').toLowerCase().includes(qVal)||(i.cat||'').toLowerCase().includes(qVal)||(i.tags||[]).some(t=>t.toLowerCase().includes(qVal)))}
+  if(!list.length){grid.innerHTML='<div class="empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6"/></svg><p>没有找到图标</p><span>试试上传或修改搜索条件</span></div>';return}
+  let cls='grid'+(view==='list'?' list':'');
+  grid.innerHTML=list.map((i,idx)=>renderCard(i,idx)).join('');
+  grid.className=cls
+}
+
+function renderCard(i,idx){
+  let selCls=selected.has(i.id)?' sel':'',favCls=i.fav?' on':'';
+  let g=renderGlyph(i,32,32);
+  let cat=(i.cat||'未分类');
+  return`<div class="card${selCls}" data-id="${i.id}" style="--i:${idx}">
+    <button class="fav${favCls}" data-action="fav"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></button>
+    <div class="glyph" data-action="edit">${g}</div>
+    <div class="cname" data-action="edit">${esc(i.name||'未命名')}</div>
+    <div class="cmeta">${cat}</div>
+    <div class="cact">
+      <button data-action="sel" title="多选"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5" class="chk-mark"/></svg></button>
+      <button data-action="edit" title="编辑"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7l3 3-9 9-4 1 1-4 9-9z"/><path d="M15 7l2-2a1 1 0 011.4 0l1.6 1.6a1 1 0 010 1.4L18 10"/></svg></button>
+      <button data-action="dl" title="下载 SVG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7.5 11.5L12 16l4.5-4.5"/><path d="M4 20h16"/></svg></button>
+      <button data-action="share" title="分享"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="17.5" cy="6" r="2.6"/><circle cx="6.5" cy="12" r="2.6"/><circle cx="17.5" cy="18" r="2.6"/><path d="M9 10.7l6-3.4M9 13.3l6 3.4"/></svg></button>
+    </div>
+  </div>`
+}
+
+function renderGlyph(i,w,h){
+  if(i.type==='raster')return`<img src="${escAttr(i.raw)}" width="${w}" height="${h}" style="object-fit:contain;border-radius:3px">`;
+  let color=(i.color&&i.color!=='currentColor')?i.color:null;
+  let str=buildSvgString(i.raw,{color:color,strokeWidth:i.strokeWidth||null,w:w,h:h,defaultInk:getComputedInk()});
+  return str||`<svg width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="#BE4429" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg>`
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}
+function getComputedInk(){return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()}
+
+function renderCats(){let ctr=document.getElementById('cats');computeStats();
+  let merged=[...DEFAULT_CATS.filter(c=>c!=='全部图标'),'未分类',...userCats];
+  let allCats=new Set(merged);for(let i of icons){if(i.cat)allCats.add(i.cat)}
+  let html='<button class="chip'+(currentCat==='全部图标'?' on':'')+'" data-cat="全部图标">全部图标<b>'+(catCounts['全部图标']||icons.length)+'</b></button>';
+  for(let c of [...allCats]){
+    let isUser=userCats.includes(c)&&!DEFAULT_CATS.includes(c)&&c!=='未分类';
+    html+='<button class="chip'+(currentCat===c?' on':'')+(isUser?' usercat':'')+'" data-cat="'+escAttr(c)+'">'+esc(c)+'<b>'+(catCounts[c]||0)+'</b>';
+    if(isUser)html+='<span class="chip-del" data-delcat="'+escAttr(c)+'">\u00d7</span>';
+    html+='</button>'
+  }
+  html+='<button class="chip addcat" id="addCatBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>新增</button>';
+  ctr.innerHTML=html
+}
+
+function renderAll(){renderCats();renderGrid();updateMeter()}
+function updateSelbar(){let n=selected.size;let bar=document.getElementById('selbar');
+  document.getElementById('selN').textContent='已选 '+n;
+  if(n>0){bar.classList.add('on')}else{bar.classList.remove('on')}
+}
+
+/* ========== drawer / editor ========== */
+function openDrawer(id){
+  drawerId=id;let i=icons.find(x=>x.id===id);if(!i)return;
+  document.getElementById('en').value=i.name||'';
+  // Build custom category dropdown
+  let cats=[...new Set(icons.map(x=>x.cat).filter(Boolean))];
+  let currentCatVal=i.cat||'';
+  let menuHtml='<button data-value=""'+(currentCatVal===''?' class="on"':'')+'>未分类</button>';
+  for(let c of cats)menuHtml+='<button data-value="'+escAttr(c)+'"'+(currentCatVal===c?' class="on"':'')+'>'+esc(c)+'</button>';
+  document.getElementById('ecatMenu').innerHTML=menuHtml;
+  document.getElementById('ecatBtn').querySelector('span').textContent=currentCatVal||'未分类';
+
+  document.getElementById('etags').value='';
+  let tl=document.getElementById('etaglist');
+  tl.innerHTML=(i.tags||[]).map(t=>'<span class="tag">'+esc(t)+'<button data-tag="'+escAttr(t)+'">\u2715</button></span>').join('');
+
+  // Always show color field; preview as type indicator
+  document.getElementById('efav').classList.toggle('on',!!i.fav);
+
+  if(i.type==='raster'){
+    document.getElementById('colorFld').style.display='none';
+    document.getElementById('strokeFld').style.display='none';
+  }else{
+    document.getElementById('colorFld').style.display='';
+    let isCur=!i.color||i.color==='currentColor';
+    let curColor=i.color||'currentColor';
+    document.getElementById('eswatches').innerHTML=PRESET_COLORS.map(c=>{
+      let v=c==='currentColor'?'auto':c;
+      let on=curColor===c?' on':'';
+      let sty=c==='currentColor'?'':('background:'+c);
+      let check=curColor===c?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 12l5.5 5.5L20 7"/></svg>':'';
+      return'<button class="sw '+v+on+'" data-color="'+escAttr(c)+'" style="'+sty+'">'+check+'</button>'
+    }).join('')+'<button class="sw custom"><input type="color" id="ecolor" value="'+(i.color&&i.color!=='currentColor'?i.color:'#1A1917')+'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v7"/><path d="M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg></button>';
+
+    let parsed=SVGI.parse(i.raw);
+    R.isStroke=parsed?SVGI.isStroke(parsed):false;
+    let sf=document.getElementById('strokeFld');
+    if(R.isStroke){
+      sf.style.display='';
+      let v=i.strokeWidth||(parsed?SVGI.defaultStrokeWidth(parsed):1.6);
+      document.getElementById('esw').value=v;
+      document.getElementById('eswv').textContent=v;
+    }else{
+      sf.style.display='none';
+    }
+  }
+
+  renderDrawerPreview();
+  document.getElementById('drawer').classList.add('on');document.getElementById('scrim').classList.add('on')
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('on');document.getElementById('scrim').classList.remove('on');drawerId=null}
+function saveDrawer(){
+  if(!drawerId)return;let i=icons.find(x=>x.id===drawerId);if(!i)return;
+  i.name=document.getElementById('en').value.trim()||'未命名';
+  i.cat=document.querySelector('#ecatMenu button.on')?.dataset.value||'';
+  i.tags=(document.getElementById('etaglist').innerText||'').split(/\s+/).filter(Boolean);
+  i.fav=document.getElementById('efav').classList.contains('on');
+  let cs=document.getElementById('eswatches').querySelector('.sw.on:not(.custom)');
+  let customInput=document.getElementById('ecolor');
+  if(cs){i.color=cs.dataset.color}
+  else if(customInput&&i.type!=='raster'){i.color=customInput.value}
+  if(document.getElementById('strokeFld').style.display!=='none'){
+    i.strokeWidth=parseFloat(document.getElementById('esw').value);
+  }
+  saveIcons();renderAll();toast('已保存')
+}
+function deleteDrawer(){
+  if(!drawerId)return;cf('确定删除这个图标？',()=>{
+    icons=icons.filter(x=>x.id!==drawerId);saveIcons();closeDrawer();selected.delete(drawerId);renderAll();updateSelbar();toast('已删除')
+  })
+}
+let R={el:null,isStroke:false};
+function renderDrawerPreview(){
+  let i=icons.find(x=>x.id===drawerId);if(!i)return;
+  if(i.type==='raster'){
+    document.getElementById('stagemain').innerHTML='<img src="'+escAttr(i.raw)+'" style="max-width:100px;max-height:100px;border-radius:4px">';
+    document.getElementById('sizes').innerHTML='';
+    return
+  }
+  let parsed=SVGI.parse(i.raw);
+  if(!parsed)return;
+  R.isStroke=SVGI.isStroke(parsed);
+  let userColor=(i.color&&i.color!=='currentColor')?i.color:null;
+  let useSW=R.isStroke?(i.strokeWidth||SVGI.defaultStrokeWidth(parsed)):null;
+  let mainStr=buildSvgString(i.raw,{color:userColor,strokeWidth:useSW,w:96,h:96,defaultInk:getComputedInk()});
+  document.getElementById('stagemain').innerHTML=mainStr;
+  let szCont=document.getElementById('sizes');
+  szCont.innerHTML=[16,24,32,48].map(s=>{
+    let str=buildSvgString(i.raw,{color:userColor,strokeWidth:useSW,w:s,h:s,defaultInk:getComputedInk()});
+    return'<div class="szitem"><i>'+str+'</i><span>'+s+'px</span></div>'
+  }).join('')
+}
+
+function applyDrawerColor(color){
+  if(!drawerId)return;
+  renderDrawerPreview();
+}
+
+/* ========== upload ========== */
+function parseIcon(svgStr,fileName){
+  let el=SVGI.parse(svgStr);if(!el){toast('无法解析 SVG，请检查格式','err');return}
+  let name=fileName?fileName.replace(/\.svg$/i,''):'';
+  let sw=SVGI.defaultStrokeWidth(el);
+  icons.unshift({id:generateId(),name:name||'未命名',raw:svgStr,cat:'',tags:[],fav:false,ts:Date.now(),color:'currentColor',strokeWidth:sw,type:'svg'});
+  saveIcons();renderAll();
+  if(!name)toast('已导入，请在待整理区设置名称')
+  else toast('已导入：'+name)
+}
+
+function handleFiles(files){
+  for(let f of files){
+    if(f.name.endsWith('.svg')){SVGI.parseFile(f).then(t=>{parseIcon(t,f.name)}).catch(()=>toast('读取失败: '+f.name,'err'))}
+    else if(f.name.match(/\.(png|jpe?g)$/i)){
+      let r=new FileReader();r.onload=()=>{
+        let img=new Image();img.onload=()=>{let c=document.createElement('canvas');let w=img.width,h=img.height;if(w>800){h*=800/w;w=800}
+          c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+          let dataUrl=c.toDataURL('image/png');
+          icons.unshift({id:generateId(),name:f.name.replace(/\.\w+$/,''),raw:dataUrl,cat:'',tags:[],fav:false,ts:Date.now(),type:'raster'});
+          saveIcons();renderAll();toast('已导入: '+f.name)
+        };img.src=r.result
+      };r.readAsDataURL(f)
+    }else{toast('不支持的文件类型: '+f.name,'err')}
+  }
+}
+
+/* ========== share ========== */
+function openShare(id){shareId=id;document.getElementById('shtabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.tab==='svg'));updateTabInk();renderShareCode();document.getElementById('shModal').classList.add('on')}
+function closeShare(){document.getElementById('shModal').classList.remove('on');shareId=null}
+function renderShareCode(){
+  let i=icons.find(x=>x.id===shareId);if(!i)return;
+  let atab=document.getElementById('shtabs').querySelector('.on');let tab=atab?atab.dataset.tab:'svg';
+  let str=buildSvgStringForExport(i.raw,{color:i.color||null,strokeWidth:i.strokeWidth||null});
+  if(!str){document.getElementById('shcode').textContent='无法解析此图标';return}
+  let url=SVGI.toDataURL(str);
+  let code='';
+  if(tab==='svg')code=str;
+  else if(tab==='dataurl')code=url;
+  else if(tab==='css')code='background-image: url("'+url.replace(/"/g,'\\"')+'");';
+  else if(tab==='react')code='const '+((i.name||'icon').replace(/[^a-zA-Z0-9]/g,'_'))+' = () => (\n  '+str.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'\n);';
+  else if(tab==='html')code='<img src="'+url+'" alt="'+(i.name||'icon')+'" />';
+  document.getElementById('shcode').textContent=code
+}
+function updateTabInk(){let ab=document.getElementById('shtabs').querySelector('.on');let ink=document.querySelector('#shtabs .ink');
+  if(ab){ink.style.transform='translateX('+ab.offsetLeft+'px)';ink.style.width=ab.offsetWidth+'px'}}
+
+/* ========== download ========== */
+function downloadIcon(id){
+  let i=icons.find(x=>x.id===id);if(!i)return;
+  if(i.type==='raster'){downloadFile(i.raw,(i.name||'icon')+'.png','image/png');return}
+  let str=buildSvgStringForExport(i.raw,{color:i.color||null,strokeWidth:i.strokeWidth||null});
+  if(!str){toast('无法解析此图标','err');return}
+  downloadFile(str,(i.name||'icon')+'.svg','image/svg+xml')
+}
+function downloadPNG(id){
+  let i=icons.find(x=>x.id===id);if(!i)return;
+  if(i.type==='raster'){downloadFile(i.raw,(i.name||'icon')+'.png','image/png');return}
+  let color=i.color||'#1A1917';
+  if(color==='currentColor')color=getComputedInk();
+  let str=buildSvgStringForExport(i.raw,{color:color,strokeWidth:i.strokeWidth||null});
+  if(!str){toast('无法解析此图标','err');return}
+  SVGI.toPNG(str,96,96).then(b=>{let url=URL.createObjectURL(b);let a=document.createElement('a');a.href=url;a.download=(i.name||'icon')+'.png';a.click();URL.revokeObjectURL(url);toast('PNG 已下载')})
+}
+function downloadFile(content,filename,mime){
+  let b=new Blob([content],{type:mime});let url=URL.createObjectURL(b);let a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)
+}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>toast('已复制到剪贴板')).catch(()=>toast('复制失败','err'))}
+
+/* ========== input modal (replaces native prompt) ========== */
+let inpResolve=null;
+function openInput(title,placeholder,defVal){
+  return new Promise((resolve)=>{
+    document.getElementById('inpTitle').textContent=title;
+    document.getElementById('inpField').placeholder=placeholder||'';
+    document.getElementById('inpField').value=defVal||'';
+    document.getElementById('inpModal').classList.add('on');
+    setTimeout(()=>document.getElementById('inpField').focus(),80);
+    inpResolve=resolve
+  })
+}
+document.getElementById('inpOk').addEventListener('click',()=>{let v=document.getElementById('inpField').value.trim();document.getElementById('inpModal').classList.remove('on');if(inpResolve){inpResolve(v);inpResolve=null}});
+document.getElementById('inpCancel').addEventListener('click',()=>{document.getElementById('inpModal').classList.remove('on');if(inpResolve){inpResolve(null);inpResolve=null}});
+document.getElementById('inpBack').addEventListener('click',()=>{document.getElementById('inpModal').classList.remove('on');if(inpResolve){inpResolve(null);inpResolve=null}});
+document.getElementById('inpField').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('inpOk').click()}});
+
+/* ========== toast / confirm ========== */
+function toast(msg,type){
+  let ctr=document.getElementById('toasts');
+  let el=document.createElement('div');el.className='toast'+(type==='err'?' err':'');
+  let icon=type==='err'?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    :type==='ok'?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M4 12l5.5 5.5L20 7"/></svg>':'';
+  el.innerHTML=icon+'<span>'+esc(msg)+'</span>';
+  ctr.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)},2200)
+}
+function cf(msg,onOk){document.getElementById('cfTitle').textContent='确认操作';document.getElementById('cfBody').textContent=msg;document.getElementById('cfModal').classList.add('on');cfResolve=onOk}
+function cfHide(){document.getElementById('cfModal').classList.remove('on');cfResolve=null}
+
+/* ========== event delegation ========== */
+document.getElementById('grid').addEventListener('click',e=>{
+  let card=e.target.closest('.card');if(!card)return;
+  let id=card.dataset.id, act=(e.target.closest('[data-action]')||{}).dataset.action;
+  if(!act)return;
+  e.preventDefault();
+  if(act==='sel'){selected.has(id)?selected.delete(id):selected.add(id);card.classList.toggle('sel',selected.has(id));updateSelbar()}
+  else if(act==='edit'){openDrawer(id)}
+  else if(act==='dl'){downloadIcon(id)}
+  else if(act==='share'){openShare(id)}
+  else if(act==='fav'){let i=icons.find(x=>x.id===id);if(i){i.fav=!i.fav;card.querySelector('.fav').classList.toggle('on',i.fav);saveIcons();renderAll()}}
+});
+document.getElementById('grid').addEventListener('dblclick',e=>{
+  let card=e.target.closest('.card');if(!card)return;openDrawer(card.dataset.id)
+});
+
+/* category chips */
+document.getElementById('cats').addEventListener('click',e=>{
+  // Delete button on a user category
+  let del=e.target.closest('.chip-del');if(del){e.stopPropagation();deleteCategory(del.dataset.delcat);return}
+  // Add category button
+  if(e.target.closest('.addcat')){e.stopPropagation();addCategory();return}
+  // Regular chip
+  let chip=e.target.closest('.chip');if(!chip)return;currentCat=chip.dataset.cat;renderAll()
+});
+
+function addCategory(){
+  openInput('新增分类','输入分类名称').then(name=>{
+    if(!name)return;
+    if(userCats.includes(name)||DEFAULT_CATS.includes(name)||name==='未分类'){toast('分类已存在','err');return}
+    userCats.push(name);
+    saveIcons();renderAll();toast('已添加分类：'+name)
+  })
+}
+function deleteCategory(name){
+  let used=icons.some(i=>i.cat===name);
+  if(used){toast('有 '+icons.filter(i=>i.cat===name).length+' 个图标在使用此分类，请先移走','err');return}
+  cf('确定删除分类「'+name+'」？',()=>{
+    userCats=userCats.filter(c=>c!==name);
+    if(currentCat===name)currentCat='全部图标';
+    saveIcons();renderAll();toast('已删除分类：'+name)
+  })
+}
+
+/* sort */
+/* sort dropdown */
+document.getElementById('sortBtn').addEventListener('click',function(e){
+  e.stopPropagation();
+  document.querySelectorAll('.ddMenu.on').forEach(m=>m.classList.remove('on'));
+  document.querySelectorAll('.ddBtn.open').forEach(b=>b.classList.remove('open'));
+  let menu=document.getElementById('sortDropdown').querySelector('.ddMenu');
+  menu.classList.toggle('on');this.classList.toggle('open',menu.classList.contains('on'));
+});
+document.getElementById('sortDropdown').querySelector('.ddMenu').addEventListener('click',e=>{
+  let btn=e.target.closest('button');if(!btn)return;e.stopPropagation();
+  sortBy=btn.dataset.value;
+  document.getElementById('sortBtn').querySelector('span').textContent=btn.textContent;
+  document.querySelectorAll('#sortDropdown .ddMenu button').forEach(b=>b.classList.toggle('on',b===btn));
+  document.getElementById('sortDropdown').querySelector('.ddMenu').classList.remove('on');
+  document.getElementById('sortBtn').classList.remove('open');
+  renderGrid()
+});
+
+/* view toggle */
+document.getElementById('vGrid').addEventListener('click',()=>{view='grid';document.getElementById('vGrid').classList.add('on');document.getElementById('vList').classList.remove('on');renderGrid()});
+document.getElementById('vList').addEventListener('click',()=>{view='list';document.getElementById('vList').classList.add('on');document.getElementById('vGrid').classList.remove('on');renderGrid()});
+
+/* search */
+document.getElementById('q').addEventListener('input',()=>{renderGrid()});
+
+/* drawer */
+document.getElementById('scrim').addEventListener('click',closeDrawer);
+document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+document.getElementById('ddel').addEventListener('click',deleteDrawer);
+document.getElementById('en').addEventListener('input',()=>{clearTimeout(window._ds);window._ds=setTimeout(saveDrawer,600)});
+/* ecat dropdown */
+document.getElementById('ecatBtn').addEventListener('click',function(e){
+  e.stopPropagation();
+  document.querySelectorAll('.ddMenu.on').forEach(m=>m.classList.remove('on'));
+  document.querySelectorAll('.ddBtn.open').forEach(b=>b.classList.remove('open'));
+  let menu=document.getElementById('ecatMenu');menu.classList.toggle('on');this.classList.toggle('open',menu.classList.contains('on'));
+});
+document.getElementById('ecatMenu').addEventListener('click',e=>{
+  let btn=e.target.closest('button');if(!btn)return;e.stopPropagation();
+  document.querySelectorAll('#ecatMenu button').forEach(b=>b.classList.toggle('on',b===btn));
+  document.getElementById('ecatBtn').querySelector('span').textContent=btn.textContent;
+  document.getElementById('ecatMenu').classList.remove('on');
+  document.getElementById('ecatBtn').classList.remove('open');
+  saveDrawer()
+});
+document.getElementById('efav').addEventListener('click',function(){this.classList.toggle('on');saveDrawer()});
+document.getElementById('dsvg').addEventListener('click',()=>{if(drawerId)downloadIcon(drawerId)});
+document.getElementById('dpng').addEventListener('click',()=>{if(drawerId)downloadPNG(drawerId)});
+document.getElementById('dshare').addEventListener('click',()=>{if(drawerId)openShare(drawerId)});
+document.getElementById('eswatches').addEventListener('click',e=>{
+  let sw=e.target.closest('.sw:not(.custom)');if(!sw)return;
+  document.querySelectorAll('#eswatches .sw').forEach(s=>s.classList.remove('on'));sw.classList.add('on');
+  applyDrawerColor(sw.dataset.color);saveDrawer()
+});
+document.getElementById('ecolor')?.addEventListener('input',function(){
+  document.querySelectorAll('#eswatches .sw').forEach(s=>s.classList.remove('on'));
+  applyDrawerColor(this.value);clearTimeout(window._dc);window._dc=setTimeout(saveDrawer,300)
+});
+document.getElementById('esw').addEventListener('input',function(){
+  document.getElementById('eswv').textContent=this.value;
+  if(!drawerId)return;
+  let i=icons.find(x=>x.id===drawerId);if(!i||i.type==='raster')return;
+  let v=parseFloat(this.value);
+  let userColor=(i.color&&i.color!=='currentColor')?i.color:null;
+  let mainStr=buildSvgString(i.raw,{color:userColor,strokeWidth:v,w:96,h:96,defaultInk:getComputedInk()});
+  if(!mainStr)return;
+  document.getElementById('stagemain').innerHTML=mainStr;
+  let szCont=document.getElementById('sizes');
+  [...szCont.children].forEach(sz=>{
+    let s=parseInt(sz.querySelector('span').textContent);
+    let str=buildSvgString(i.raw,{color:userColor,strokeWidth:v,w:s,h:s,defaultInk:getComputedInk()});
+    sz.querySelector('i').innerHTML=str
+  });
+  clearTimeout(window._de);window._de=setTimeout(saveDrawer,300)
+});
+document.getElementById('etags').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();let v=this.value.trim();if(!v)return;
+    let tl=document.getElementById('etaglist');if(tl.querySelector('.tag')){tl.innerHTML+='<span class="tag">'+esc(v)+'<button data-tag="'+escAttr(v)+'">\u2715</button></span>'}
+    else{tl.innerHTML='<span class="tag">'+esc(v)+'<button data-tag="'+escAttr(v)+'">\u2715</button></span>'}
+    this.value='';saveDrawer()}
+});
+document.getElementById('etaglist').addEventListener('click',function(e){
+  let btn=e.target.closest('button[data-tag]');if(!btn)return;btn.parentElement.remove();saveDrawer()
+});
+
+/* upload modal */
+document.getElementById('upBtn').addEventListener('click',()=>{document.getElementById('upModal').classList.add('on');document.getElementById('scode').value=''});
+document.getElementById('upBack').addEventListener('click',()=>document.getElementById('upModal').classList.remove('on'));
+document.getElementById('upClose').addEventListener('click',()=>document.getElementById('upModal').classList.remove('on'));
+document.getElementById('spaste').addEventListener('click',()=>{
+  let v=document.getElementById('scode').value.trim();if(!v)return;parseIcon(v,'');document.getElementById('scode').value=''
+});
+document.getElementById('dz').addEventListener('click',()=>document.getElementById('fi').click());
+document.getElementById('dzBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('fi').click()});
+document.getElementById('fi').addEventListener('change',function(){if(this.files.length)handleFiles(this.files);this.value=''});
+
+/* drag & drop */
+let dragCounter=0;
+document.addEventListener('dragenter',e=>{e.preventDefault();dragCounter++;if(dragCounter===1)document.getElementById('dropVeil').classList.add('on')});
+document.addEventListener('dragleave',e=>{e.preventDefault();dragCounter--;if(dragCounter===0)document.getElementById('dropVeil').classList.remove('on')});
+document.addEventListener('dragover',e=>{e.preventDefault()});
+document.addEventListener('drop',e=>{e.preventDefault();dragCounter=0;document.getElementById('dropVeil').classList.remove('on');
+  if(e.dataTransfer?.files?.length)handleFiles(e.dataTransfer.files)});
+let dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('hot')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('hot'));
+dz.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('hot');if(e.dataTransfer?.files?.length)handleFiles(e.dataTransfer.files)});
+
+/* share modal */
+document.getElementById('shBack').addEventListener('click',closeShare);
+document.getElementById('shClose').addEventListener('click',closeShare);
+document.getElementById('shcopy').addEventListener('click',()=>{
+  let code=document.getElementById('shcode').textContent;copyText(code)
+});
+document.getElementById('shdl').addEventListener('click',()=>{
+  if(!shareId)return;let tab=document.getElementById('shtabs').querySelector('.on').dataset.tab;
+  let i=icons.find(x=>x.id===shareId);if(!i)return;
+  if(tab==='svg')downloadIcon(shareId);
+  else{let code=document.getElementById('shcode').textContent;downloadFile(code,(i.name||'icon')+'.txt','text/plain')}
+});
+document.getElementById('shtabs').addEventListener('click',e=>{
+  let btn=e.target.closest('button');if(!btn)return;
+  document.querySelectorAll('#shtabs button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');updateTabInk();renderShareCode()
+});
+
+/* confirm modal */
+document.getElementById('cfBack').addEventListener('click',cfHide);
+document.getElementById('cfCancel').addEventListener('click',cfHide);
+document.getElementById('cfOk').addEventListener('click',()=>{if(cfResolve)cfResolve();cfHide()});
+
+/* backup strip */
+document.getElementById('expBtn').addEventListener('click',exportJSON);
+document.getElementById('impBtn').addEventListener('click',()=>document.getElementById('impfi').click());
+document.getElementById('impfi').addEventListener('change',function(){if(this.files[0])importJSON(this.files[0]);this.value=''});
+document.getElementById('seedBtn').addEventListener('click',()=>{cf('确定清除所有示例数据？',clearSamples)});
+document.getElementById('wipeBtn').addEventListener('click',clearAll);
+
+/* selection bar */
+document.getElementById('sX').addEventListener('click',()=>{selected.clear();updateSelbar();renderGrid()});
+document.getElementById('sDl').addEventListener('click',()=>{let arr=[...selected];arr.forEach(id=>downloadIcon(id))});
+document.getElementById('sDel').addEventListener('click',()=>{
+  cf('确定删除已选的 '+selected.size+' 个图标？',()=>{icons=icons.filter(i=>!selected.has(i.id));selected.clear();saveIcons();renderAll();updateSelbar();toast('已删除')})
+});
+document.getElementById('sCat').addEventListener('click',()=>{
+  openInput('批量设置分类','输入分类名称（将应用到已选图标）').then(cat=>{
+    if(!cat)return;
+    for(let id of selected){let i=icons.find(x=>x.id===id);if(i)i.cat=cat}
+    saveIcons();renderAll();toast('已设置分类：'+cat)
+  })
+});
+document.getElementById('sSprite').addEventListener('click',()=>{
+  let arr=[...selected];if(!arr.length)return;
+  let parts=arr.map(id=>{
+    let i=icons.find(x=>x.id===id);if(!i)return'';
+    if(i.type==='raster')return'';
+    let color=i.color||'currentColor';
+    let str=buildSvgStringForExport(i.raw,{color:i.color||null,strokeWidth:i.strokeWidth||null});
+    if(!str)return'';
+    // strip width/height and add id
+    str=str.replace(/^<svg([^>]*)>/,function(_,attrs){
+      let cleaned=attrs.replace(/\s+width\s*=\s*"[^"]*"/,'').replace(/\s+height\s*=\s*"[^"]*"/,'');
+      return '<svg'+cleaned+' id="icon-'+escAttr(i.name||i.id)+'">'
+    });
+    return str
+  }).filter(Boolean);
+  let sprite='<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n<defs>\n'+parts.join('\n')+'\n</defs>\n</svg>';
+  downloadFile(sprite,'icon-sprite.svg','image/svg+xml');toast('SVG Sprite 已导出')
+});
+document.getElementById('sShare').addEventListener('click',()=>{
+  let arr=[...selected];if(!arr.length)return;
+  let pkg={icons:icons.filter(i=>selected.has(i.id)),theme};downloadFile(JSON.stringify(pkg,null,2),'iconbench-share-'+new Date().toISOString().slice(0,10)+'.json','application/json');toast('分享包已导出')
+});
+
+/* theme */
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  theme=theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',theme);
+  saveIcons();renderThemeBtn();renderAll()
+});
+function renderThemeBtn(){
+  let b=document.getElementById('themeBtn');b.innerHTML=theme==='dark'?
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' :
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'
+}
+
+/* nudge */
+document.getElementById('nudgeX').addEventListener('click',function(){document.getElementById('nudge').classList.remove('on')});
+function checkNudge(){if(icons.length>=30&&!localStorage.getItem('wb_iconbench_nudge')){document.getElementById('nudge').classList.add('on')}}
+document.getElementById('nudgeX').addEventListener('click',()=>{localStorage.setItem('wb_iconbench_nudge','1');document.getElementById('nudge').classList.remove('on')});
+
+/* global: close dropdowns on outside click */
+document.addEventListener('click',()=>{
+  document.querySelectorAll('.ddMenu.on').forEach(m=>m.classList.remove('on'));
+  document.querySelectorAll('.ddBtn.open').forEach(b=>b.classList.remove('open'));
+});
+
+/* keyboard */
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveDrawer();return}
+  if(e.key==='/'&&document.activeElement!==document.getElementById('q')&&document.activeElement!==document.getElementById('en')&&document.activeElement!==document.getElementById('etags')&&document.activeElement!==document.getElementById('scode')){e.preventDefault();document.getElementById('q').focus()}
+  if(e.key==='Escape'){closeDrawer();closeShare();cfHide();document.getElementById('upModal').classList.remove('on');selected.clear();updateSelbar();renderGrid()}
+});
+
+/* init */
+(async function(){
+  await loadIcons();
+  theme=theme||'light';document.documentElement.setAttribute('data-theme',theme);
+  renderThemeBtn();renderAll();checkNudge();
+})();
+})();</script>
+</body>
+</html>
